@@ -29,7 +29,12 @@ fn draw_pointer(
     if let Some((_, hit)) = pointer.iter().next().and_then(|p| p.get_nearest_hit()) {
         if let Some(normal) = hit.normal {
             let position = hit.position.unwrap_or_default();
-            gizmos.circle(position + normal * 0.01, normal, 0.1, Color::RED);
+            let distance = position + normal * 0.1;
+            gizmos.circle(distance, normal, 0.1, Color::RED);
+            //create a Transform::IDENTITY for the box, defaults to scales 1 and rotations 0
+            let transform = Transform::from_translation(distance.round()); // <- Round the position to snap to the grid.
+            // Draw a wireframe box
+            gizmos.cuboid( transform, Color::RED);
         }
     }
 }
@@ -40,22 +45,13 @@ fn setup(
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
-      // plane
-    commands.spawn((
-        PbrBundle {
-            mesh: meshes.add(Mesh::from(shape::Plane::from_size(5.0))),
-            material: materials.add(Color::WHITE.into()),
-            ..default()
-        },
-        PickableBundle::default(), // <- Makes the mesh pickable.
-    ));
 
     // cube
     commands.spawn((
         PbrBundle {
             mesh: meshes.add(Mesh::from(shape::Cube { size: 1.0 })),
             material: materials.add(Color::WHITE.into()),
-            transform: Transform::from_xyz(0.0, 0.5, 0.0),
+            transform: Transform::from_xyz(0.0, 0.0, 0.0),
             ..default()
         },
         PickableBundle::default(), // <- Makes the mesh pickable.
