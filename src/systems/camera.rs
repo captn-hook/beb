@@ -2,10 +2,9 @@ use bevy::{
     prelude::*,
     input::mouse::MouseWheel,
 };
-
 use crate::resources::cursorstate::CursorState;
+use crate::settings::input::InputSystem;
 
-//camera wasd and mouse pan (right click) / zoom
 pub fn camera_movement(
     time: Res<Time>,
     keyboard_input: Res<Input<KeyCode>>,
@@ -16,6 +15,9 @@ pub fn camera_movement(
     mut cursor_state: ResMut<CursorState>,
 ) {
     let mut delta = Vec3::ZERO;
+    let mut input_system = InputSystem::new();
+    input_system.update(&keyboard_input, &mouse_input);
+
     for (mut transform, _camera) in query.iter_mut() {
         let mut changed = false;
         for event in ev_cursor_moved.read() {
@@ -32,7 +34,7 @@ pub fn camera_movement(
 
         let mut sensitivity = 5.0;
 
-        if keyboard_input.pressed(KeyCode::ShiftLeft) {
+        if input_system.speed.slow {
             sensitivity = 15.0;
         }
 
@@ -41,27 +43,27 @@ pub fn camera_movement(
             changed = true;
         }
         
-        if keyboard_input.pressed(KeyCode::W) {
+        if input_system.movement.forward {
             delta.z -= sensitivity;
             changed = true;
         }
-        if keyboard_input.pressed(KeyCode::S) {
+        if input_system.movement.backward {
             delta.z += sensitivity;
             changed = true;
         }
-        if keyboard_input.pressed(KeyCode::A) {
+        if input_system.movement.left {
             delta.x -= sensitivity;
             changed = true;
         }
-        if keyboard_input.pressed(KeyCode::D) {
+        if input_system.movement.right {
             delta.x += sensitivity;
             changed = true;
         }
-        if keyboard_input.pressed(KeyCode::Space) {
+        if input_system.movement.up {
             delta.y += sensitivity;
             changed = true;
         }
-        if keyboard_input.pressed(KeyCode::ControlLeft) {
+        if input_system.movement.down {
             delta.y -= sensitivity;
             changed = true;
         }

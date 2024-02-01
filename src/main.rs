@@ -11,6 +11,10 @@ mod scenes {
     pub mod basic;
 }
 
+mod settings {
+    pub mod input;
+}
+
 use bevy::prelude::*;
 use bevy_mod_picking::prelude::*;
 use systems::pointer::draw_pointer;
