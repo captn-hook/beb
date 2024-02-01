@@ -1,10 +1,12 @@
 use bevy::prelude::*;
 use bevy::input::keyboard::KeyCode;
 
+#[derive(Resource)]
 pub struct InputSystem {
     pub movement: Movement,
     pub speed: Speed,
     pub pan: bool,
+    pub interact: bool,
 }
 
 pub struct Movement {
@@ -37,6 +39,7 @@ impl InputSystem {
                 fast: false,
             },
             pan: false,
+            interact: false,
         }
     }
 
@@ -52,5 +55,14 @@ impl InputSystem {
         self.speed.fast = keyboard_input.pressed(KeyCode::ShiftRight);
     
         self.pan = mouse_button_input.pressed(MouseButton::Right);
+        self.interact = mouse_button_input.pressed(MouseButton::Left);
     }
+}
+
+pub fn update_input_system(
+    keyboard_input: Res<Input<KeyCode>>,
+    mouse_button_input: Res<Input<MouseButton>>,
+    mut input_system: ResMut<InputSystem>,
+) {
+    input_system.update(&keyboard_input, &mouse_button_input);
 }

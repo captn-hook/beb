@@ -7,16 +7,14 @@ use crate::settings::input::InputSystem;
 
 pub fn camera_movement(
     time: Res<Time>,
-    keyboard_input: Res<Input<KeyCode>>,
     mouse_input: Res<Input<MouseButton>>,
+    input_system: Res<InputSystem>,
     mut ev_cursor_moved: EventReader<CursorMoved>,
     mut ev_scroll: EventReader<MouseWheel>,
     mut query: Query<(&mut Transform, &Camera)>,
     mut cursor_state: ResMut<CursorState>,
 ) {
     let mut delta = Vec3::ZERO;
-    let mut input_system = InputSystem::new();
-    input_system.update(&keyboard_input, &mouse_input);
 
     for (mut transform, _camera) in query.iter_mut() {
         let mut changed = false;

@@ -1,5 +1,5 @@
+use crate::objects::cube::new_cube_bundle;
 use bevy::prelude::*;
-use bevy_mod_picking::prelude::*;
 
 /// set up a simple 3D scene
 pub fn setup(
@@ -7,18 +7,8 @@ pub fn setup(
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
-
     // cube
-    commands.spawn((
-        PbrBundle {
-            mesh: meshes.add(Mesh::from(shape::Cube { size: 1.0 })),
-            material: materials.add(Color::WHITE.into()),
-            transform: Transform::from_xyz(0.0, 0.0, 0.0),
-            ..default()
-        },
-        PickableBundle::default(), // <- Makes the mesh pickable.
-    ));
-
+    commands.spawn(new_cube_bundle(Vec3::new(0.0, 0.0, 0.0), &mut meshes, &mut materials));
     // light
     commands.spawn(PointLightBundle {
         point_light: PointLight {
