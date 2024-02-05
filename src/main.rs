@@ -29,7 +29,7 @@ use resources::cursorstate::CursorState;
 use scenes::basic::setup;
 use systems::place_block::place_block;
 use settings::input::{InputSystem, update_input_system};
-use resources::blockplaced::BlockPlaced;
+use resources::blockplaced::{BlockPlaced, block_placed_update_system};
 
 fn main() {
     App::new()
@@ -42,6 +42,7 @@ fn main() {
         .insert_resource(InputSystem::new())
         .insert_resource(BlockPlaced::new(0.25))
         .add_systems(Startup, setup)
+        .add_systems(Update, block_placed_update_system)
         .add_systems(Update, update_input_system)
         .add_systems(Update, draw_pointer)
         .add_systems(Update, camera_movement)

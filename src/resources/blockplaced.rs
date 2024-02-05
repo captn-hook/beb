@@ -2,31 +2,32 @@ use bevy::prelude::*;
 
 #[derive(Resource)]
 pub struct BlockPlaced {
-    last_placed: Option<Timer>,
-    cooldown: Timer,
+    timer: Timer,
+    pub can_place: bool,
 }
 
 impl BlockPlaced {
     pub fn new(cooldown: f32) -> Self {
         Self {
-            last_placed: None,
-            cooldown: Timer::from_seconds(cooldown, TimerMode::Once),
+            timer: Timer::from_seconds(cooldown, TimerMode::Once),
+            can_place: true,
         }
     }
 
-    pub fn can_place(&mut self, time: Res<Time>) -> bool {
-        if let Some(last_placed) = &mut self.last_placed {
-            last_placed.tick(time.delta());
-            if last_placed.finished() {
-                self.last_placed = None;
-                return true;
+    pub fn placed(&mut self) {
+        self.can_place = false;
+        self.timer.reset();
+    }
+
+    pub fn update(&mut self, time: &Time) {
+        if !self.can_place {
+            if self.timer.tick(time.delta()).just_finished() {
+                self.can_place = true;
             }
         }
-    
-        self.last_placed.is_none()
     }
+}
 
-    pub fn placed_block(&mut self) {
-        self.last_placed = Some(self.cooldown.clone());
-    }
+pub fn block_placed_update_system(mut block_placed: ResMut<BlockPlaced>, time: Res<Time>) {
+    block_placed.update(&time);
 }
