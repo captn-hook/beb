@@ -25,7 +25,8 @@ pub fn new_cube_bundle(
     location: Vec3,
     meshes: &mut ResMut<Assets<Mesh>>,
     materials: &mut ResMut<Assets<StandardMaterial>>,
-) -> (PbrBundle, PickableBundle) {
+    commands: &mut Commands,
+) {
     let cube = Cube {
         size: 1.0,
         color: Color::rgb(0.8, 0.7, 0.6),
@@ -34,13 +35,21 @@ pub fn new_cube_bundle(
     let mesh = cube.mesh(meshes);
     let material = cube.material(materials);
 
-    (
-        PbrBundle {
-            mesh,
-            material,
-            transform: Transform::from_translation(location),
-            ..Default::default()
-        },
-        PickableBundle::default(),
-    )
+    let pbr_bundle = PbrBundle {
+        mesh,
+        material,
+        transform: Transform::from_translation(location),
+        ..Default::default()
+    };
+
+    let pickable_bundle = PickableBundle::default();
+
+    commands.spawn((
+        pbr_bundle,
+        pickable_bundle,
+        // Despawn an entity when clicked:
+        On::<Pointer<Click>>::target_commands_mut(|_click, target_commands| {
+            target_commands.despawn();
+        }),
+    ));
 }

@@ -1,12 +1,19 @@
-use bevy::prelude::*;
+use bevy::{
+    prelude::*,
+    input::mouse::MouseWheel,
+};
 use bevy::input::keyboard::KeyCode;
 
 #[derive(Resource)]
 pub struct InputSystem {
     pub movement: Movement,
     pub speed: Speed,
-    pub pan: bool,
-    pub interact: bool,
+    pub interact_1: bool,
+    pub interact_2: bool,
+    pub interact_3: bool,
+    pub cursor_position: Vec2,
+    pub cursor_moved_delta: Vec2,
+    pub mouse_wheel_delta: f32,
 }
 
 pub struct Movement {
@@ -38,12 +45,16 @@ impl InputSystem {
                 slow: false,
                 fast: false,
             },
-            pan: false,
-            interact: false,
+            interact_1: false,
+            interact_2: false,
+            interact_3: false,
+            cursor_position: Vec2::ZERO,
+            cursor_moved_delta: Vec2::ZERO,
+            mouse_wheel_delta: 0.0,
         }
     }
 
-    pub fn update(&mut self, keyboard_input: &Res<Input<KeyCode>>, mouse_button_input: &Res<Input<MouseButton>>) {
+    pub fn update(&mut self, keyboard_input: &Res<Input<KeyCode>>, mouse_button_input: &Res<Input<MouseButton>>, cursor_input: &mut EventReader<CursorMoved>, scroll: &mut EventReader<MouseWheel>) {
         self.movement.forward = keyboard_input.pressed(KeyCode::W);
         self.movement.backward = keyboard_input.pressed(KeyCode::S);
         self.movement.left = keyboard_input.pressed(KeyCode::A);
@@ -54,15 +65,28 @@ impl InputSystem {
         self.speed.slow = keyboard_input.pressed(KeyCode::ShiftLeft);
         self.speed.fast = keyboard_input.pressed(KeyCode::ShiftRight);
     
-        self.pan = mouse_button_input.pressed(MouseButton::Right);
-        self.interact = mouse_button_input.pressed(MouseButton::Left);
+        self.interact_1 = mouse_button_input.pressed(MouseButton::Left);
+        self.interact_2 = mouse_button_input.pressed(MouseButton::Right);
+        self.interact_3 = mouse_button_input.pressed(MouseButton::Middle);
+
+        for event in cursor_input.read() {
+            self.cursor_moved_delta = event.position - self.cursor_position;
+            self.cursor_position = event.position;
+        }
+
+        self.mouse_wheel_delta = 0.0;
+        for event in scroll.read() {
+            self.mouse_wheel_delta += event.y;
+        }
     }
 }
 
 pub fn update_input_system(
     keyboard_input: Res<Input<KeyCode>>,
     mouse_button_input: Res<Input<MouseButton>>,
+    mut cursor_input: EventReader<CursorMoved>,
+    mut scroll: EventReader<MouseWheel>,
     mut input_system: ResMut<InputSystem>,
 ) {
-    input_system.update(&keyboard_input, &mouse_button_input);
+    input_system.update(&keyboard_input, &mouse_button_input, &mut cursor_input, &mut scroll);
 }

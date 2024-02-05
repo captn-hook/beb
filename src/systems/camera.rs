@@ -1,43 +1,31 @@
-use bevy::{
-    prelude::*,
-    input::mouse::MouseWheel,
-};
-use crate::resources::cursorstate::CursorState;
+use bevy::prelude::*;
 use crate::settings::input::InputSystem;
 
 pub fn camera_movement(
     time: Res<Time>,
-    mouse_input: Res<Input<MouseButton>>,
     input_system: Res<InputSystem>,
-    mut ev_cursor_moved: EventReader<CursorMoved>,
-    mut ev_scroll: EventReader<MouseWheel>,
     mut query: Query<(&mut Transform, &Camera)>,
-    mut cursor_state: ResMut<CursorState>,
 ) {
     let mut delta = Vec3::ZERO;
 
+    let mut sensitivity = 0.005;
+
     for (mut transform, _camera) in query.iter_mut() {
         let mut changed = false;
-        for event in ev_cursor_moved.read() {
-            if mouse_input.pressed(MouseButton::Right) {
-                let delta = event.position - cursor_state.previous_position;
-                let sensitivity = 0.001;
-                let yaw = Quat::from_rotation_y(-delta.x * sensitivity);
-                let pitch = Quat::from_rotation_x(-delta.y * sensitivity);
-                transform.rotation = yaw * transform.rotation * pitch;
-                changed = true;
-            }
-            cursor_state.previous_position = event.position;
+        if input_system.interact_3 {
+            let yaw = Quat::from_rotation_y(-input_system.cursor_moved_delta.x * sensitivity);
+            let pitch = Quat::from_rotation_x(-input_system.cursor_moved_delta.y * sensitivity);
+            transform.rotation = yaw * transform.rotation * pitch;
+            changed = true;
         }
-
-        let mut sensitivity = 5.0;
+    
 
         if input_system.speed.slow {
             sensitivity = 15.0;
         }
 
-        for event in ev_scroll.read() {
-            delta.z -= event.y * sensitivity;
+        if input_system.mouse_wheel_delta != 0.0 {
+            delta.z -= input_system.mouse_wheel_delta * sensitivity;
             changed = true;
         }
         

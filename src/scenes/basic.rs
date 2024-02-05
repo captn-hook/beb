@@ -8,7 +8,7 @@ pub fn setup(
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
     // cube
-    commands.spawn(new_cube_bundle(Vec3::new(0.0, 0.0, 0.0), &mut meshes, &mut materials));
+    new_cube_bundle(Vec3::new(0.0, 0.0, 0.0), &mut meshes, &mut materials, &mut commands);
     // light
     commands.spawn(PointLightBundle {
         point_light: PointLight {

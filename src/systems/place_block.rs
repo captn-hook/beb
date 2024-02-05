@@ -12,8 +12,8 @@ pub fn place_block(
     cursor_state: Res<CursorState>,
     mut place_delay: ResMut<BlockPlaced>,
 ) {
-    if input_system.interact && place_delay.can_place {
-        commands.spawn(new_cube_bundle(cursor_state.grid_position, &mut meshes, &mut materials));
+    if input_system.interact_1 && place_delay.can_place {
+        new_cube_bundle(cursor_state.grid_position, &mut meshes, &mut materials, &mut commands);
         place_delay.placed();
     }
 }
