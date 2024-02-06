@@ -26,7 +26,6 @@ pub struct Movement {
 }
 
 pub struct Speed {
-    pub slow: bool,
     pub fast: bool,
 }
 
@@ -42,7 +41,6 @@ impl InputSystem {
                 down: false,
             },
             speed: Speed {
-                slow: false,
                 fast: false,
             },
             interact_1: false,
@@ -55,15 +53,14 @@ impl InputSystem {
     }
 
     pub fn update(&mut self, keyboard_input: &Res<Input<KeyCode>>, mouse_button_input: &Res<Input<MouseButton>>, cursor_input: &mut EventReader<CursorMoved>, scroll: &mut EventReader<MouseWheel>) {
-        self.movement.forward = keyboard_input.pressed(KeyCode::W);
-        self.movement.backward = keyboard_input.pressed(KeyCode::S);
-        self.movement.left = keyboard_input.pressed(KeyCode::A);
-        self.movement.right = keyboard_input.pressed(KeyCode::D);
+        self.movement.forward = keyboard_input.pressed(KeyCode::W) || keyboard_input.pressed(KeyCode::Up);
+        self.movement.backward = keyboard_input.pressed(KeyCode::S) || keyboard_input.pressed(KeyCode::Down);
+        self.movement.left = keyboard_input.pressed(KeyCode::A) || keyboard_input.pressed(KeyCode::Left);
+        self.movement.right = keyboard_input.pressed(KeyCode::D) || keyboard_input.pressed(KeyCode::Right);
         self.movement.up = keyboard_input.pressed(KeyCode::Space);
-        self.movement.down = keyboard_input.pressed(KeyCode::ControlLeft);
+        self.movement.down = keyboard_input.pressed(KeyCode::ControlLeft) || keyboard_input.pressed(KeyCode::ControlRight);
     
-        self.speed.slow = keyboard_input.pressed(KeyCode::ShiftLeft);
-        self.speed.fast = keyboard_input.pressed(KeyCode::ShiftRight);
+        self.speed.fast = keyboard_input.pressed(KeyCode::ShiftLeft) || keyboard_input.pressed(KeyCode::ShiftRight);
     
         self.interact_1 = mouse_button_input.pressed(MouseButton::Left);
         self.interact_2 = mouse_button_input.pressed(MouseButton::Right);

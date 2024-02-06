@@ -12,7 +12,7 @@ pub fn camera_movement(
 
     for (mut transform, _camera) in query.iter_mut() {
         let mut changed = false;
-        if input_system.interact_3 {
+        if input_system.interact_3 && (input_system.cursor_moved_delta * 10.0).round() / 10.0 != Vec2::ZERO {
             let yaw = Quat::from_rotation_y(-input_system.cursor_moved_delta.x * sensitivity);
             let pitch = Quat::from_rotation_x(-input_system.cursor_moved_delta.y * sensitivity);
             transform.rotation = yaw * transform.rotation * pitch;
@@ -20,8 +20,10 @@ pub fn camera_movement(
         }
     
 
-        if input_system.speed.slow {
+       if input_system.speed.fast {
             sensitivity = 15.0;
+        } else {
+            sensitivity = 3.0;
         }
 
         if input_system.mouse_wheel_delta != 0.0 {
